@@ -1,0 +1,53 @@
+controller
+
+   public function search($search){
+    $search = urldecode($search);
+    $keywords = ProductModel::select()
+            ->where('name', 'LIKE', '%'.$search.'%')
+            ->orderBy('id', 'desc')
+            ->paginate(8);
+    if (count($keywords) == 0){
+        return View('themes.search')
+        ->with('message', 'Không có k?t qu? nào ðý?c t?m th?y')
+        ->with('search', $search);
+    } else{
+        return View('themes.search')
+        ->with('keywords', $keywords)
+        ->with('search', $search);
+    }
+}
+
+route
+
+Route::get('home/searchredirect', function(){
+    if (empty(Input::get('txtsearch'))) return redirect()->back();
+    $search = urlencode(e(Input::get('txtsearch')));
+    $route = "tim-kiem/key_word=$search";
+    return redirect($route);
+    });
+    Route::get("tim-kiem/key_word={search}", "FrontEndController@search");  
+	
+	
+view
+
+<form role="search" action="{{url('home/searchredirect')}}" >
+         <div class="input-group form-search">
+             <input type="text" class="form-control" name="txtsearch" placeholder="t?m ki?m s?n ph?m" value="">
+      <span class="input-group-btn">
+          <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
+      </span>
+    </div>
+    </form>
+	
+	paginate
+	
+	@if($new_temp->hasPages())
+                            <div class="pagination-wrapper">
+                            <div class="pagination-wrapper-inner">
+                            {!!  $new_temp->render() !!}
+                            </div>
+                            </div>
+                            @endif
+	
+
+
